@@ -1,11 +1,126 @@
 * {
     padding: 0;
     margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: "Inter", sans-serif;
+    background: linear-gradient(45deg, #f7944d, #b958da);
+    height: 100vh;
+    width: 100vw;
+}
+
+.logo {
+    font-family: "Ga Maamli", sans-serif;
+    color: #fab42a;
+    font-size: 5rem;
+    padding: 1rem 0 0;
+    text-align: center;
+    -webkit-text-stroke: 1px #000000;
+}
+
+.form {
+    width: 20vw;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    background-color: white;
+    padding: 2.5rem;
+    border-radius: 50px;
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.form-field {
+    font-size: 1.5rem;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+}
+
+.form-button {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    border-radius: 10px;
+    font-weight: bold;
+    background-color: #f59d10;
+}
+
+.form-button:hover {
+    background-color: #f7db4d;
+}
+
+.form-button:active {
+    background-color: #f77d4d;
+}
+
+.form p {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+a {
+    text-decoration: none;
+    color: blue;
+}
+
+a:link {
+    color: blue;
+    text-decoration: none; 
+}
+
+a:visited {
+    color: blue;
+    text-decoration: none; 
+}
+
+.chatroom-select {
+    font-size: 2rem;
+    margin-left: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.chatroom-select select {
+    font-size: 2rem;
 }
 
 .chat-container {
+    margin-left: 2rem;
+    margin-bottom: 0.5rem;
+    background-color: white;
     width: 90vw;
     height: 70vh;
     overflow-y: scroll;
     overflow-x: auto;
+    font-size: 2rem;
+}
+
+.chat-input {
+    margin-left: 2rem;
+}
+
+.chat-input input {
+    width: 80vw;
+    font-size: 2rem;
+    padding: 0.25rem 0.75rem;
+}
+
+.chat-input button {
+    width: 10vw;
+    font-size: 2rem;
+    padding: 0.25rem 0.75rem;
+    background-color: #f59d10;
+}
+
+.chat-input button:hover {
+    background-color: #f7db4d;
+}
+
+.chat-input button:active {
+    background-color: #f77d4d;
 }
