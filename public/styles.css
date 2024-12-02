@@ -1,0 +1,11 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.chat-container {
+    width: 90vw;
+    height: 70vh;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
