@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <!-- JQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <title>Chattastic</title>
+</head>
+<body>
+    <main>
+        <label for="room-select">Choose a room:</label>
+        <select id="room-select" name="room-select">
+            <!-- Rooms filled in here-->
+        </select>
+        <div id="chat-container" class="chat-container">
+            <!-- messages filled in here-->
+        </div>
+        <input type="text" id="message-input" placeholder="Type your message" />
+        <button id="send-message">Send</button>
+    </main>
+    <script src="script.js"></script>
+    <script src="socket.js"></script>
+</body>
+</html>

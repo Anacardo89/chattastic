@@ -41,4 +41,15 @@ const verifyToken = (req, res, next) => {
     });
 };
 
-module.exports = { hashPassword, comparePassword, generateToken, verifyToken };
+function verifyTokenWSock(token) {
+    return new Promise((resolve, reject) => {
+      jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          return reject('Invalid token');
+        }
+        resolve(decoded);  // The decoded JWT payload (user info)
+      });
+    });
+  }
+
+module.exports = { hashPassword, comparePassword, generateToken, verifyToken, verifyTokenWSock };
