@@ -3,18 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ga+Maamli&family=Sixtyfour+Convergence&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
     <!-- JQuery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <title>Chattastic</title>
 </head>
 <body>
+    <h1 class="logo">CHATTASTIC</h1>
     <main>
-        <h1>Registo</h1>
-        <input type="text" id="reg-user" placeholder="User">
-        <input type="password" id="reg-password" placeholder="Senha">
-        <button id="reg-button">Registar</button>
-        <p>Já tem uma conta? <a href="index.html">Login</a></p>
+        <div class="form">
+            <h1 class="form-title">Register</h1>
+            <h2 class="form-label">User</h2>
+            <input class="form-field" type="text" id="reg-user" placeholder="User">
+            <h2 class="form-label">Password</h2>
+            <input class="form-field" type="password" id="reg-password" placeholder="Password">
+            <button class="form-button" id="reg-button">Registar</button>
+            <p>Have an account? <a href="index.html">Login</a></p>
+        </div>
     </main>
     <script src="script.js"></script>
 </body>
