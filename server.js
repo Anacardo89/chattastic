@@ -85,7 +85,6 @@ app.post('/api/rooms/:roomName/messages', (req, res) => {
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Extract the token from the query string
   const token = socket.handshake.query.token;
   
   if (!token) {
@@ -94,13 +93,11 @@ io.on('connection', (socket) => {
       return;
   }
 
-  // Verify the token using the verifyToken function from auth.js
   auth.verifyTokenWSock(token)
       .then(decoded => {
-          // The decoded object will contain the user ID from the token
-          const userId = decoded.userId;  // Assuming 'id' is returned by your JWT
+          
+          const userId = decoded.userId;
 
-          // Query the database to get the user's username
           db.query('SELECT username FROM users WHERE id = ?', [userId], (err, result) => {
               if (err || result.length === 0) {
                   console.log('User not found');
@@ -108,41 +105,36 @@ io.on('connection', (socket) => {
                   return;
               }
 
-              // Attach the username to the socket object
               socket.user = {
                   id: userId,
-                  username: result[0].username  // Assume the username is in the first result
+                  username: result[0].username 
               };
               console.log('User authenticated:', socket.user.username);
 
-              // Handle the join room event
               socket.on('joinRoom', (roomName) => {
                   socket.join(roomName);
                   console.log(`${socket.user.username} joined room: ${roomName}`);
               });
 
-              // Handle sending messages
               socket.on('sendMessage', (messageData) => {
                   console.log('New message:', messageData);
 
-                  // Emit the message to the room with the user's username
                   io.to(messageData.roomName).emit('newMessage', {
-                      username: socket.user.username, // Access the username from the decoded token
+                      username: socket.user.username,
                       content: messageData.msg,
                   });
 
                   console.log(`Message sent to room ${messageData.roomName}:`, messageData);
               });
 
-              // Handle disconnection
               socket.on('disconnect', () => {
                   console.log(`${socket.user ? socket.user.username : 'A user'} disconnected`);
               });
           });
       })
       .catch(err => {
-          console.log(err); // If token verification fails, log the error
-          socket.disconnect(); // Disconnect the socket if the token is invalid
+          console.log(err);
+          socket.disconnect(); 
       });
 });
 
