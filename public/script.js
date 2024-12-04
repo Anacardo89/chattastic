@@ -16,7 +16,13 @@ const clearToken = () => {
 $(document).ready(function() {
     $('#reg-button')?.on('click', register);
     $('#login-button')?.on('click', login);
+    $('#logout-button')?.on('click', logout);
 });
+
+function logout() {
+    clearToken();
+    window.location.href = 'index.html';
+}
 
 
 function register() {
