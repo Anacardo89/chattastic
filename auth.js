@@ -21,7 +21,7 @@ const generateToken = (userId) => {
 
 // Verificar token
 const verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
+    const authHeader = req.headers['Authorization'];
     if (!authHeader) {
         return res.status(403).json({ message: 'Token não fornecido!' });
     }

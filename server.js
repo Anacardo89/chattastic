@@ -1,21 +1,41 @@
-
-
+const path = require('path');
 const express = require('express');
-const bodyParser = require('body-parser');
+const http = require('http');
+const { Server } = require('socket.io');
 const cors = require('cors');
 const db = require('./db');
 const auth = require('./auth');
 require('dotenv').config();
 
+
 const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const server = http.createServer(app);
+const io = require('socket.io')(server);
 
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.set('view engine', 'ejs');
+app.set('views', './views'); 
+app.use(express.static('public')); 
+
+app.use('/socket.io', express.static(path.join(__dirname, 'node_modules', 'socket.io', 'client-dist')));
+
+app.get('/', (req, res) => {
+  res.render('index', {});
+});
+
+app.get('/register', (req, res) => {
+  res.render('register', {});
+});
+
+app.get('/chat', (req, res) => {
+  res.render('chat', {});
+});
+
 
 app.post('/api/register', async (req, res) => {
   const { user_name, password } = req.body;
@@ -82,20 +102,21 @@ app.post('/api/rooms/:roomName/messages', (req, res) => {
   });
 });
 
+io.use((socket, next) => {
+  const token = socket.handshake.query.token;  // Token from the query
+  console.log('Received token:', token);  // Log the token to verify it's being sent
+
+  if (!token) {
+    console.log('Token missing in handshake');
+    return next(new Error('Authentication error'));  // Disconnect if token is missing
+  }
+});
+
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  const token = socket.handshake.query.token;
-  
-  if (!token) {
-      console.log('No token provided');
-      socket.disconnect();
-      return;
-  }
-
   auth.verifyTokenWSock(token)
       .then(decoded => {
-          
           const userId = decoded.userId;
 
           db.query('SELECT username FROM users WHERE id = ?', [userId], (err, result) => {
@@ -138,6 +159,6 @@ io.on('connection', (socket) => {
       });
 });
 
-http.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

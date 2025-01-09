@@ -21,7 +21,7 @@ $(document).ready(function() {
 
 function logout() {
     clearToken();
-    window.location.href = 'index.html';
+    window.location.href = '/';
 }
 
 
@@ -39,7 +39,7 @@ function register() {
         data: JSON.stringify(data),
         success: function(xhr) {
             alert(xhr.message);
-            window.location.href = 'index.html';
+            window.location.href = '/';
         },
         error: function(xhr) {
             const errorMessage = xhr.responseText;
@@ -64,7 +64,7 @@ function login(el) {
         success: function(xhr) {
             setToken(xhr.token);
             alert('Login bem-sucedido!');
-            window.location.href = 'chat.html';
+            window.location.href = '/chat';
         },
         error: function(xhr) {
             const errorMessage = xhr.responseText;
