@@ -3,7 +3,7 @@ $(document).ready(function() {
     if (!token) return alert('Please log in first.');
 
     const socket = io({
-        query: { token }  // Pass token as a query parameter to the server
+        query: { token: token }  // Pass token as a query parameter to the server
     });
 
     // Listen for successful connection
