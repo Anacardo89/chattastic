@@ -63,7 +63,6 @@ function login(el) {
         data: JSON.stringify(data),
         success: function(xhr) {
             setToken(xhr.token);
-            alert('Login bem-sucedido!');
             window.location.href = '/chat';
         },
         error: function(xhr) {

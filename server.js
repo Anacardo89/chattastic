@@ -1,122 +1,122 @@
-const path = require('path');
+const cors = require('cors');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const cors = require('cors');
-const db = require('./db');
+const path = require('path');
 const auth = require('./auth');
+const db = require('./db');
 require('dotenv').config();
-
-
-const app = express();
-const server = http.createServer(app);
-const io = require('socket.io')(server);
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+      credentials: true,
+    },
+});
+
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Serve static files from 'public' folder
+app.use(express.static(path.join(__dirname, 'public')));
 
+// Set EJS as the view engine
 app.set('view engine', 'ejs');
-app.set('views', './views'); 
-app.use(express.static('public')); 
 
-app.use('/socket.io', express.static(path.join(__dirname, 'node_modules', 'socket.io', 'client-dist')));
-
+// Serve the index.ejs template on the root route
 app.get('/', (req, res) => {
-  res.render('index', {});
+  res.render('index');
 });
 
 app.get('/register', (req, res) => {
-  res.render('register', {});
+    res.render('register');
 });
 
 app.get('/chat', (req, res) => {
-  res.render('chat', {});
+    res.render('chat');
 });
 
-
 app.post('/api/register', async (req, res) => {
-  const { user_name, password } = req.body;
-  const hashedPassword = await auth.hashPassword(password);
+    const { user_name, password } = req.body;
+    const hashedPassword = await auth.hashPassword(password);
 
-  db.query('INSERT INTO users (username, password) VALUES (?, ?);', [user_name, hashedPassword], (err) => {
-      if (err) return res.status(500).json({ error: err });
-      res.json({ message: 'Utilizador registrado com sucesso!' });
-  });
+    db.query('INSERT INTO users (username, password) VALUES (?, ?);', [user_name, hashedPassword], (err) => {
+        if (err) return res.status(500).json({ error: err });
+        res.json({ message: 'Utilizador registrado com sucesso!' });
+    });
 });
 
 app.post('/api/login', async (req, res) => {
-  const { user_name, password } = req.body;
-  
-  db.query('SELECT * FROM users WHERE username = ?', [user_name], async (err, results) => {
-      if (err || results.length === 0) return res.status(401).json({ message: 'Utilizador ou senha inválidos!' });
-      const user = results[0];
-      const match = await auth.comparePassword(password, user.password);
-      if (!match) return res.status(401).json({ message: 'Utilizador ou senha inválidos!' });
-      const token = auth.generateToken(user.id);
-      res.json({ token });
-  });
+    const { user_name, password } = req.body;
+
+    db.query('SELECT * FROM users WHERE username = ?', [user_name], async (err, results) => {
+        if (err || results.length === 0) return res.status(401).json({ message: 'Utilizador ou senha inválidos!' });
+        const user = results[0];
+        const match = await auth.comparePassword(password, user.password);
+        if (!match) return res.status(401).json({ message: 'Utilizador ou senha inválidos!' });
+        const token = auth.generateToken(user.id);
+        res.json({ token });
+    });
 });
 
 app.use(auth.verifyToken);
 
 app.get('/api/rooms', (req, res) => {
-  db.query('SELECT * FROM rooms', (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json(result);
-  });
+    db.query('SELECT * FROM rooms', (err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(result);
+    });
 });
 
 app.get('/api/rooms/:roomName/messages', (req, res) => {
-  const { roomName } = req.params;
+    const { roomName } = req.params;
 
-  db.query('SELECT * FROM rooms WHERE name = ?', [roomName], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    if (result.length === 0) return res.status(404).json({ error: 'Room not found' });
-    const room = result[0];
+    db.query('SELECT * FROM rooms WHERE name = ?', [roomName], (err, result) => {
+        if (err) return res.status(500).json({ error: err });
+        if (result.length === 0) return res.status(404).json({ error: 'Room not found' });
+        const room = result[0];
 
-    db.query('SELECT messages.*, users.username FROM messages JOIN users ON messages.sender_id = users.id WHERE room_id = ? ORDER BY created_at ASC;', [room.id], (err, results) => {
-      if (err) return res.status(500).json({ error: err });
-      res.json(results);
+        db.query('SELECT messages.*, users.username FROM messages JOIN users ON messages.sender_id = users.id WHERE room_id = ? ORDER BY created_at ASC;', [room.id], (err, results) => {
+        if (err) return res.status(500).json({ error: err });
+        res.json(results);
+        });
     });
-  });
 });
 
 app.post('/api/rooms/:roomName/messages', (req, res) => {
-  const { roomName } = req.params; 
-  const { msg } = req.body;
+    const { roomName } = req.params; 
+    const { msg } = req.body;
 
-  db.query('SELECT * FROM rooms WHERE name = ?', [roomName], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    if (result.length === 0) return res.status(404).json({ error: 'Room not found' });
-    const room = result[0];
-
-    db.query('INSERT INTO messages (room_id, sender_id, content) VALUES (?, ?, ?)', 
-      [room.id, req.userId, msg], 
-      (err, results) => {
+    db.query('SELECT * FROM rooms WHERE name = ?', [roomName], (err, result) => {
         if (err) return res.status(500).json({ error: err });
-        res.json({ id: results.insertId, room_id: room.id, sender_id: req.userId, content: msg });
+        if (result.length === 0) return res.status(404).json({ error: 'Room not found' });
+        const room = result[0];
+
+        db.query('INSERT INTO messages (room_id, sender_id, content) VALUES (?, ?, ?)', 
+        [room.id, req.userId, msg], 
+        (err, results) => {
+            if (err) return res.status(500).json({ error: err });
+            res.json({ id: results.insertId, room_id: room.id, sender_id: req.userId, content: msg });
+        });
     });
-  });
 });
 
-io.use((socket, next) => {
-  const token = socket.handshake.query.token;  // Token from the query
-  console.log('Received token:', token);  // Log the token to verify it's being sent
-
-  if (!token) {
-    console.log('Token missing in handshake');
-    return next(new Error('Authentication error'));  // Disconnect if token is missing
-  }
-});
-
+// Initialize Socket.IO connection
 io.on('connection', (socket) => {
-  console.log('A user connected');
-
+  console.log('a user connected');
   auth.verifyTokenWSock(token)
       .then(decoded => {
+          console.log('Token decoded:', decoded);
           const userId = decoded.userId;
 
           db.query('SELECT username FROM users WHERE id = ?', [userId], (err, result) => {
@@ -154,11 +154,13 @@ io.on('connection', (socket) => {
           });
       })
       .catch(err => {
+          console.error('Token verification failed:', err);
           console.log(err);
           socket.disconnect(); 
       });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Start the server on port 3000
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });

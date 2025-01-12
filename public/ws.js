@@ -3,7 +3,8 @@ $(document).ready(function() {
     if (!token) return alert('Please log in first.');
 
     const socket = io({
-        query: { token: token }  // Pass token as a query parameter to the server
+        query: { token: token },  // Pass token as a query parameter to the server
+        transports: ['websocket'],
     });
 
     // Listen for successful connection
@@ -11,6 +12,14 @@ $(document).ready(function() {
         console.log('Socket connected');
         // Populate the room select dropdown and automatically join the first room
         populateSelect(socket);  // Ensure socket is passed into this function
+    });
+
+    socket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
+    });
+    
+    socket.on('disconnect', (reason) => {
+        console.log('Socket disconnected:', reason);
     });
 
     // Handle room selection change
