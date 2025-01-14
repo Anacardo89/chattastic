@@ -42,9 +42,17 @@ app.get('/register', (req, res) => {
     res.render('register');
 });
 
-app.get('/chat', (req, res) => {
-    res.render('chat');
+app.get('/chat', auth.verifyToken, (req, res) => {
+    const userId  = req.userId;
+    db.query('SELECT * FROM users WHERE id = ?', [userId], async (err, results) => {
+        const is_admin = results[0].is_admin;
+        res.render('chat', {is_admin});
+    });
 });
+
+app.get('/admin', (req, res) => {
+    res.render('admin');
+  });
 
 app.post('/api/register', async (req, res) => {
     const { user_name, password } = req.body;
@@ -56,18 +64,34 @@ app.post('/api/register', async (req, res) => {
     });
 });
 
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', (req, res) => {
     const { user_name, password } = req.body;
-
+    
     db.query('SELECT * FROM users WHERE username = ?', [user_name], async (err, results) => {
-        if (err || results.length === 0) return res.status(401).json({ message: 'Utilizador ou senha inválidos!' });
-        const user = results[0];
-        const match = await auth.comparePassword(password, user.password);
-        if (!match) return res.status(401).json({ message: 'Utilizador ou senha inválidos!' });
-        const token = auth.generateToken(user.id);
-        res.json({ token });
+        if (err) {
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (!results.length || !await auth.comparePassword(password, results[0].password)) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Generate the token
+        const token = auth.generateToken(results[0].id);
+        console.log(`token: ${token}`);
+        
+        // Set the token as a cookie in the response
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            maxAge: 60 * 60 * 1000,
+            sameSite: 'Strict',
+            path: '/'
+        });
+        res.redirect('/chat');
     });
 });
+
 
 app.use(auth.verifyToken);
 
