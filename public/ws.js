@@ -44,7 +44,10 @@ $(document).ready(function() {
 // Populate room select dropdown
 function populateSelect(socket) {
     const token = getToken();
-    if (!token) return alert('Please log in first.');
+    if (!token) {
+        return alert('Please log in first.');
+    }
+    console.log('Token:', token);
 
     const select = $('#room-select');
     $.ajax({

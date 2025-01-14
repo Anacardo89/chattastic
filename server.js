@@ -113,8 +113,14 @@ app.post('/api/rooms/:roomName/messages', (req, res) => {
 
 // Initialize Socket.IO connection
 io.on('connection', (socket) => {
-  console.log('a user connected');
-  auth.verifyTokenWSock(token)
+    const token = socket.handshake.query.token;
+    if (!token) {
+        console.error('No token provided');
+        socket.disconnect();
+        return;
+    }
+    console.log('a user connected');
+    auth.verifyTokenWSock(token)
       .then(decoded => {
           console.log('Token decoded:', decoded);
           const userId = decoded.userId;
