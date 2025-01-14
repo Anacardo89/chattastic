@@ -1,16 +1,20 @@
-const tokenKey = 'authToken';
-
-const setToken = (token) => {
-    localStorage.setItem(tokenKey, token);
-};
-
-const getToken = () => {
-    return localStorage.getItem(tokenKey);
-};
+function getToken() {
+    const cookieName = 'token=';
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(cookieName)) {
+            return cookie.substring(cookieName.length);
+        }
+    }
+    console.log("No token found in cookies");
+    return null;
+}
 
 const clearToken = () => {
-    return localStorage.removeItem(tokenKey);
-}
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    console.log("Token cleared from cookies");
+};
 
 
 $(document).ready(function() {
@@ -31,7 +35,8 @@ function register() {
     const data = {
         user_name: username,
         password: password,
-    }
+    };
+
     $.ajax({
         url: '/api/register',
         method: 'POST',
@@ -55,15 +60,33 @@ function login(el) {
     const data = {
         user_name: username,
         password: password,
-    }
+    };
+
     $.ajax({
         url: '/api/login',
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function(xhr) {
-            setToken(xhr.token);
-            window.location.href = '/chat';
+            console.log('Login successful');
+            loadChatPage();
+        },
+        error: function(xhr) {
+            const errorMessage = xhr.responseText;
+            alert(errorMessage);
+        }
+    });
+}
+
+function loadChatPage() {
+    $.ajax({
+        url: '/chat',
+        method: 'GET',
+        xhrFields: {
+            withCredentials: true 
+        },
+        success: function(response) {
+            console.log('Successfully loaded chat page');
         },
         error: function(xhr) {
             const errorMessage = xhr.responseText;

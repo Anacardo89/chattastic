@@ -16,6 +16,9 @@
 </head>
 <body>
     <h1 class="logo">CHATTASTIC</h1>
+    <% if (is_admin) { %>
+        <a href="/admin">Admin Page</a>
+    <% } %>
     <main>
         <div class="chatroom-select">
             <label for="room-select">Choose a room:</label>
