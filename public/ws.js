@@ -51,7 +51,7 @@ function populateSelect(socket) {
 
     const select = $('#room-select');
     $.ajax({
-        url: '/api/rooms',  // Adjust to your API endpoint for rooms
+        url: '/api/rooms/active',  // Adjust to your API endpoint for rooms
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`

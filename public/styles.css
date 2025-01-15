@@ -105,37 +105,22 @@ a:visited {
 }
 
 .chat-input input {
-    width: 80vw;
+    width: 50vw;
     font-size: 2rem;
     padding: 0.25rem 0.75rem;
 }
 
-.chat-input button {
+button {
     width: 10vw;
-    font-size: 2rem;
+    font-size: 1rem;
     padding: 0.25rem 0.75rem;
     background-color: #f59d10;
 }
 
-.chat-input button:hover {
+button:hover {
     background-color: #f7db4d;
 }
 
-.chat-input button:active {
-    background-color: #f77d4d;
-}
-
-.logout-button {
-    width: 10vw;
-    font-size: 2rem;
-    padding: 0.25rem 0.75rem;
-    background-color: #f59d10;
-}
-
-.logout-button:hover {
-    background-color: #f7db4d;
-}
-
-.logout-button:active {
+button:active {
     background-color: #f77d4d;
 }

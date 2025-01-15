@@ -82,7 +82,7 @@ app.post('/api/login', (req, res) => {
         
         // Set the token as a cookie in the response
         res.cookie('token', token, {
-            httpOnly: true,
+            httpOnly: false,
             secure: false,
             maxAge: 60 * 60 * 1000,
             sameSite: 'Strict',
@@ -96,9 +96,37 @@ app.post('/api/login', (req, res) => {
 app.use(auth.verifyToken);
 
 app.get('/api/rooms', (req, res) => {
-    db.query('SELECT * FROM rooms', (err, result) => {
+    db.query('SELECT * FROM rooms;', (err, result) => {
       if (err) return res.status(500).json({ error: err });
       res.json(result);
+    });
+});
+
+app.get('/api/rooms/active', (req, res) => {
+    db.query('SELECT * FROM rooms WHERE is_active = 1', (err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(result);
+    });
+});
+
+app.post('/api/rooms', (req, res) => {
+    const roomName = req.body.room_name;
+    db.query('INSERT INTO rooms (name, is_active) VALUES (?, 0);', [roomName], (err, result) => {
+      if (err){
+        return res.status(500).json({ error: err });
+      } 
+       return res.status(201).json({ message: 'Room added successfully' });
+    });
+});
+
+app.put('/api/rooms/:roomname', (req, res) => {
+    const roomName = req.body.room_name;
+    const active = req.body.is_active;
+    db.query('UPDATE rooms SET is_active = ? WHERE name = ?;', [active, roomName], (err, result) => {
+      if (err){
+        return res.status(500).json({ error: err });
+      } 
+       return res.status(201).json({ message: 'Room updated successfully' });
     });
 });
 
@@ -132,6 +160,26 @@ app.post('/api/rooms/:roomName/messages', (req, res) => {
             if (err) return res.status(500).json({ error: err });
             res.json({ id: results.insertId, room_id: room.id, sender_id: req.userId, content: msg });
         });
+    });
+});
+
+app.get('/api/censured', (req, res) => {
+    const censuredWord = req.body.censured_word;
+    db.query('SELECT * FROM censured;', (err, results) => {
+      if (err){
+        return res.status(500).json({ error: err });
+      } 
+      res.json(results);
+    });
+});
+
+app.post('/api/censured', (req, res) => {
+    const censuredWord = req.body.censured_word;
+    db.query('INSERT INTO censured (name, is_active) VALUES (?, 0);', [censuredWord], (err, result) => {
+      if (err){
+        return res.status(500).json({ error: err });
+      } 
+       return res.status(201).json({ message: 'Censured word added successfully' });
     });
 });
 
