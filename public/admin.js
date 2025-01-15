@@ -127,11 +127,11 @@ function createAdminCensured(word, active) {
     }
 
     censoredContainer.querySelector(`#${inactiveId}`).addEventListener('change', function() {
-        updateRoomStatus(word, 0);
+        updateCensoredStatus(word, 0);
     });
 
     censoredContainer.querySelector(`#${activeId}`).addEventListener('change', function() {
-        updateRoomStatus(word, 1);
+        updateCensoredStatus(word, 1);
     });
 
     adminCensored.appendChild(censoredContainer);

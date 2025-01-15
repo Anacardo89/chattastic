@@ -189,7 +189,7 @@ app.put('/api/censured/:word', (req, res) => {
       if (err){
         return res.status(500).json({ error: err });
       } 
-       return res.status(201).json({ message: 'Room updated successfully' });
+       return res.status(201).json({ message: 'Word updated successfully' });
     });
 });
 
@@ -248,7 +248,7 @@ io.on('connection', (socket) => {
       });
 });
 
-// Start the server on port 3000
+// Start the server on port 5000
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
