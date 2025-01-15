@@ -1,3 +1,6 @@
+
+
+
 function getToken() {
     const cookieName = 'token=';
     const cookies = document.cookie.split(';');
@@ -21,11 +24,67 @@ $(document).ready(function() {
     $('#reg-button')?.on('click', register);
     $('#login-button')?.on('click', login);
     $('#logout-button')?.on('click', logout);
+    $('#new-room-button')?.on('click', addRoom);
+    $('#censured-word-button')?.on('click', addCensuredWord);
 });
 
 function logout() {
     clearToken();
     window.location.href = '/';
+}
+
+function addRoom() {
+    const roomInput = document.getElementById('new-room-input');
+    if (roomInput.value.trim() == '') {
+        alert('Room must have name');
+        return;
+    }
+    const roomName = roomInput.value;
+
+    const data = {
+        room_name: roomName,
+    };
+
+    $.ajax({
+        url: '/api/rooms',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(xhr) {
+            alert('room added with success, awaiting approval from admin');
+        },
+        error: function(xhr) {
+            const errorMessage = xhr.responseText;
+            alert(errorMessage);
+        }
+    });
+}
+
+function addCensuredWord() {
+    const censuredInput = document.getElementById('censured-word-input');
+    if (censuredInput.value == '') {
+        alert('cannot censure empty word');
+        return;
+    }
+    const censuredWord = censuredInput.value;
+
+    const data = {
+        censured_word: censuredWord,
+    };
+
+    $.ajax({
+        url: '/api/censured',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(xhr) {
+            alert('word added with success, awaiting approval from admin');
+        },
+        error: function(xhr) {
+            const errorMessage = xhr.responseText;
+            alert(errorMessage);
+        }
+    });
 }
 
 
@@ -86,7 +145,7 @@ function loadChatPage() {
             withCredentials: true 
         },
         success: function(response) {
-            console.log('Successfully loaded chat page');
+            window.location.href = '/chat';
         },
         error: function(xhr) {
             const errorMessage = xhr.responseText;
@@ -94,3 +153,4 @@ function loadChatPage() {
         }
     });
 }
+
