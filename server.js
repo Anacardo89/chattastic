@@ -164,7 +164,6 @@ app.post('/api/rooms/:roomName/messages', (req, res) => {
 });
 
 app.get('/api/censured', (req, res) => {
-    const censuredWord = req.body.censured_word;
     db.query('SELECT * FROM censured;', (err, results) => {
       if (err){
         return res.status(500).json({ error: err });
@@ -175,11 +174,22 @@ app.get('/api/censured', (req, res) => {
 
 app.post('/api/censured', (req, res) => {
     const censuredWord = req.body.censured_word;
-    db.query('INSERT INTO censured (name, is_active) VALUES (?, 0);', [censuredWord], (err, result) => {
+    db.query('INSERT INTO censured (word, is_active) VALUES (?, 0);', [censuredWord], (err, result) => {
       if (err){
         return res.status(500).json({ error: err });
       } 
        return res.status(201).json({ message: 'Censured word added successfully' });
+    });
+});
+
+app.put('/api/censured/:word', (req, res) => {
+    const word = req.body.censured_word;
+    const active = req.body.is_active;
+    db.query('UPDATE censured SET is_active = ? WHERE word = ?;', [active, word], (err, result) => {
+      if (err){
+        return res.status(500).json({ error: err });
+      } 
+       return res.status(201).json({ message: 'Room updated successfully' });
     });
 });
 
