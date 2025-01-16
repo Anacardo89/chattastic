@@ -124,3 +124,12 @@ button:hover {
 button:active {
     background-color: #f77d4d;
 }
+
+a {
+    margin-left: 2rem;
+}
+
+.admin-containers {
+    display: flex;
+    justify-content: space-evenly;
+}

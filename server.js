@@ -172,6 +172,15 @@ app.get('/api/censured', (req, res) => {
     });
 });
 
+app.get('/api/censured/active', (req, res) => {
+    db.query('SELECT * FROM censured WHERE is_active = 1;', (err, results) => {
+      if (err){
+        return res.status(500).json({ error: err });
+      } 
+      res.json(results);
+    });
+});
+
 app.post('/api/censured', (req, res) => {
     const censuredWord = req.body.censured_word;
     db.query('INSERT INTO censured (word, is_active) VALUES (?, 0);', [censuredWord], (err, result) => {

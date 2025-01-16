@@ -88,33 +88,31 @@ function sendMessage(event, socket) {
     const token = getToken();
     if (!token) return alert('Please log in first.');
 
-    const roomName = $('#room-select option:selected').text() || $('#room-select option').first().text();  // Default to the first room if not selected
+    const roomName = $('#room-select option:selected').text() || $('#room-select option').first().text();
     const message = $('#message-input').val();
-    const data = { 
-        roomName: roomName, 
-        msg: message
-    };
 
-    if (!roomName) {
-        alert('Please select a room to send a message.');
-        return;
-    }
+    censureMsg(message, function(censured_msg) {
+        const data = { 
+            roomName: roomName, 
+            msg: censured_msg 
+        };
 
-    $.ajax({
-        url: '/api/rooms/' + roomName + '/messages',
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        data: JSON.stringify(data),
-        success: function() {
-            socket.emit('sendMessage', data);  // Emit the message to the room
-            $('#message-input').val('');  // Clear the message input
-        },
-        error: function(xhr) {
-            alert('Error sending message');
-        }
+        $.ajax({
+            url: '/api/rooms/' + roomName + '/messages',
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(data),
+            success: function() {
+                socket.emit('sendMessage', data);
+                $('#message-input').val('');
+            },
+            error: function(xhr) {
+                alert('Error sending message');
+            }
+        });
     });
 }
 
@@ -123,6 +121,7 @@ function makeMsg(msg) {
     const message = document.createElement('p');
     message.innerHTML = `<strong>${msg.username}</strong>: ${msg.content}`;
     container.append(message);
+    scrollToBottom();
 }
 
 function populateChat(roomName) {
@@ -147,4 +146,33 @@ function populateChat(roomName) {
             alert(errorMessage);
         }
     });
+}
+
+function censureMsg(message, callback) {
+    const token = getToken();
+    let splitMsg = message.split(' ');
+    $.ajax({
+        url: '/api/censured/active',
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        success: function(words) {
+            const censuredMsg = splitMsg.map(word => {
+                const isCensured = words.some(censuredWord => censuredWord.word === word);
+                return isCensured ? '****' : word;
+            }).join(' ');
+
+            callback(censuredMsg);
+        },
+        error: function(xhr) {
+            callback(message);
+        }
+    });
+}
+
+function scrollToBottom() {
+    const chatWindow = document.getElementById('chat-container');
+    chatWindow.scrollTop = chatWindow.scrollHeight; 
 }
