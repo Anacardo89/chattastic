@@ -6,4 +6,4 @@
 - run the script in `sql/init.sql`
 - `npm install`
 - `npm start`
-- the app is online
+- the app is online on port 5000
